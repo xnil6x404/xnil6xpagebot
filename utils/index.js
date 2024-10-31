@@ -67,14 +67,30 @@ async function buttonMessage(sender_psid, text, buttons) {
     }
 }
 
-async function unsend(sender_psid) {
-   // Mybe unsent not possible 🐸 🐸 
+async function unsend(message_id) {
+   
+    try {
+        const response = await axios.delete(
+            `https://graph.facebook.com/v21.0/${message_id}`,
+            {
+                params: {
+                    access_token: config.Token
+                }
+            }
+        );
+        console.log("Message unsent successfully.");
+        return response.data;
+    } catch (error) {
+        console.error("Error unsending message:", error.response ? error.response.data : error.message);
+        return null
+    }
+
 }
 
 async function edit(message_id, new_text) {
     try {
        const data = await axios.post(
-            `https://graph.facebook.com/v21.0/me/messages`, {
+            `https://graph.facebook.com/v21.0/message_edits`, {
                 recipient: { id: message_id },
 
              message: { text: new_text } },

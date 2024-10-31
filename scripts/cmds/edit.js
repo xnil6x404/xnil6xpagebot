@@ -6,7 +6,13 @@ module.exports.config = {
 };
 
 module.exports.onStart = async ({ message }) => {
-  const sentMessage = await message.reply("wait  2 seconds...");
+  try {
+    const sentMessage = await message.reply("wait  2 seconds...");
   const ok = sentMessage.message_id
-await message.edit("updated 🐸🐸");
+ // message.unsend(ok)
+await message.edit(ok,"updated 🐸🐸");
+  } catch (error) {
+    message.reply(error)
+    console.log(error)
+  }
 };

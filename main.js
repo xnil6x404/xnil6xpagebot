@@ -69,8 +69,8 @@ async function handleMessage(sender_psid, received_message) {
             senderID: sender_psid,
             text: received_message.text,
             reply: (textOrMessage) => reply(sender_psid, textOrMessage),
-            unsend: () => unsend(sender_psid),
-            edit: (new_text) => edit(sender_psid, new_text),
+            unsend: (message_id) => unsend(message_id),
+            edit: (message_id,new_text) => edit(message_id, new_text),
             react: (emoji) => react(sender_psid, emoji),
             button: (text, buttons) => buttonMessage(sender_psid, text, buttons)
           },
