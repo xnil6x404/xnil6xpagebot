@@ -48,8 +48,8 @@ To add or modify commands:
 
 1. Open the `commands.js` file.
 2. Define your command and its corresponding function:
-   
-   ```javascript
+3.
+  ```javascript
    
   module.exports.onStart = ({ message, args }) => { };
    
