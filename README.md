@@ -13,7 +13,7 @@ A powerful and customizable bot designed to enhance your page interactions with 
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/dipto-008/page-bot.git](https://github.com/dipto-008/page-bot)
+   git clone https://github.com/dipto-008/page-bot.git
    ```
 
 2. Navigate to the project directory:
