@@ -8,30 +8,24 @@ module.exports.config = {
     role: 3,
     description: "Chat with baby",
     commandCategory: "fun",
-    guide: "{prefix}baby msg",
+    guide: "{prefix}baby <message>",
     coolDowns: 5,
 };
 
-module.exports.onStart = async ({ api, event, args }) => {
-    const senderId = event.sender.id;
+module.exports.onStart = async ({ event, args, message }) => {
     const msg = args.join(" ");
 
     if (!msg) {
-        return api.sendMessage(senderId, {
-            text: "Please provide a message.",
-        });
+        return message.reply("Please provide a message.");
     }
+
     try {
         const apiUrl = `https://www.noobs-api.000.pe/dipto/baby?text=${encodeURIComponent(msg)}`;
         const response = await axios.get(apiUrl);
         const data = response.data.reply;
 
-    await api.sendMessage(senderId, {
-            text: data,
-        });
+        await message.reply(data);
     } catch (error) {
-        api.sendMessage(senderId, {
-            text: error.message
-        });
+        message.reply(`Error: ${error.message}`);
     }
 };

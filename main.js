@@ -1,98 +1,87 @@
-const axios = require("axios");
 const config = require("./config.json");
 const fs = require("fs");
 const path = require("path");
-
+const { reply, unsend, edit, react , buttonMessage } = require("./utils");
+const logger = require("./utils/log/logger")
 global.functions = {
-    commands: new Map(),
-    aliases: new Map(),
-    config,
+  commands: new Map(),
+  aliases: new Map(),
+  config,
 };
-
+    logger.start();
+logger.info("— LOADING COMMANDS —\n")
 const commandFiles = fs
-    .readdirSync(path.join(__dirname, "scripts", "cmds"))
-    .filter((file) => file.endsWith(".js"));
+  .readdirSync(path.join(__dirname, "scripts", "cmds"))
+  .filter((file) => file.endsWith(".js"));
 for (const file of commandFiles) {
-    const command = require(`./scripts/cmds/${file}`);
-    global.functions.commands.set(command.config.name, command);
+  const command = require(`./scripts/cmds/${file}`);
+  global.functions.commands.set(command.config.name, command);
+  logger.cmd(`- ${command.config.name} module loaded`);
 
-    console.log(`[ COMMAND ] - ${command.config.name} module loaded`);
-
-    command.config.aliases.forEach((alias) =>
-        global.functions.aliases.set(alias, command.config.name),
-    );
+  command.config.aliases.forEach((alias) =>
+    global.functions.aliases.set(alias, command.config.name)
+  );
 }
+logger.color("cyan " + "⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻⁻");
+logger.big(`
+▒█▀▀█ ░█▀▀█ ▒█▀▀█ ▒█▀▀▀ 　 ▒█▀▀█ ▒█▀▀▀█ ▀▀█▀▀ 
+▒█▄▄█ ▒█▄▄█ ▒█░▄▄ ▒█▀▀▀ 　 ▒█▀▀▄ ▒█░░▒█ ░▒█░░ 
+▒█░░░ ▒█░▒█ ▒█▄▄█ ▒█▄▄▄ 　 ▒█▄▄█ ▒█▄▄▄█ ░▒█░░`)
+logger.info("Page Bot Initialized");
+logger.info("Admin: " + global.functions.config.admin);
+logger.info("A simple page bot");
+
 
 async function handleMessage(sender_psid, received_message) {
-    if (received_message.is_echo) return;
+//  if (received_message.is_echo) return;
 
-    if (received_message.text) {
-        const { prefix } = global.functions.config;
+  const { prefix } = global.functions.config;
 
-        if (received_message.text.startsWith(prefix)) {
-            const args = received_message.text
-                .slice(prefix.length)
-                .trim()
-                .split(/ +/);
+  if (received_message.attachments && received_message.attachments.length > 0) {
+    for (const attachment of received_message.attachments) {
+      const attachmentType = attachment.type;
+      const attachmentUrl = attachment.payload.url;
 
-            const commandName = args.shift().toLowerCase();
+      await reply(sender_psid, {
+        attachment: {
+          type: attachmentType,
+          url: attachmentUrl,
+        },
+      });
+    }
+    return;
+  }
 
-            const command =
-                global.functions.commands.get(commandName) ||
-                global.functions.commands.get(
-                    global.functions.aliases.get(commandName),
-                );
+  if (received_message.text && received_message.text.startsWith(prefix)) {
+    const args = received_message.text.slice(prefix.length).trim().split(/ +/);
+    const commandName = args.shift().toLowerCase();
 
-            if (command) {
-                try {
-                    await command.onStart({
-                        api: { sendMessage: callSendAPI },
-                        event: {
-                            sender: { id: sender_psid },
-                            text: received_message.text,
-                        },
-                        args,
-                    });
-                } catch (error) {
-                    console.error(
-                        `Error executing command ${commandName}:`,
-                        error,
-                    );
-                }
-            } else if (!command && received_message.text.startsWith(prefix)) {
-                await callSendAPI(sender_psid, {
-                    text: `The command you are using does not exist System, type ${prefix}help to see all available commands`,
-                });
-            }
-        } /*else {
-            await callSendAPI(sender_psid, { text: `You sent: "${received_message.text}"` });
-        }*/
-    } else {
-        await callSendAPI(sender_psid, {
-            text: "Sorry, I currently can't handle attachments.",
+    const command =
+      global.functions.commands.get(commandName) ||
+      global.functions.commands.get(global.functions.aliases.get(commandName));
+
+    if (command) {
+      try {
+        await command.onStart({
+          event: received_message,
+          args,
+          message: {
+            senderID: sender_psid,
+            text: received_message.text,
+            reply: (textOrMessage) => reply(sender_psid, textOrMessage),
+            unsend: () => unsend(sender_psid),
+            edit: (new_text) => edit(sender_psid, new_text),
+            react: (emoji) => react(sender_psid, emoji),
+            button: (text, buttons) => buttonMessage(sender_psid, text, buttons)
+          },
         });
+      } catch (error) {
+        console.error(`Error executing command ${commandName}:`, error);
+      }
+    } else {
+      await reply(sender_psid, commandName ? `The command "${commandName}" does not exist. Type ${prefix}help to see available commands.` : `The command you are using does not exist System, type ${prefix}help to see all available commands.`);
     }
-}
-
-async function callSendAPI(sender_psid, response) {
-    try {
-        await axios.post(
-            `https://graph.facebook.com/v2.6/me/messages`,
-            {
-                recipient: { id: sender_psid },
-                message: response,
-            },
-            {
-                params: { access_token: config.Token },
-                headers: { "Content-Type": "application/json" },
-            },
-        );
-    } catch (error) {
-        console.error(
-            "Error sending message:",
-            error.response ? error.response.data : error.message,
-        );
-    }
+  }
 }
 
 module.exports = { handleMessage };

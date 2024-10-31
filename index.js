@@ -11,7 +11,6 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Webhook for Messenger
 app.get("/webhook", (req, res) => {
     const VERIFY_TOKEN = "dipto008";
 
@@ -34,7 +33,7 @@ app.post("/webhook", async (req, res) => {
         for (const entry of body.entry) {
             const webhook_event = entry.messaging[0];
             const sender_psid = webhook_event.sender.id;
-
+            
             if (webhook_event.message) {
                 await handleMessage(sender_psid, webhook_event.message);
             }
@@ -46,4 +45,5 @@ app.post("/webhook", async (req, res) => {
 });
 
 
-app.listen(1337, () => console.log("Server is running on port 1337"));
+app.listen(1337) 
+// () => console.log("Server is running on port 1337"));

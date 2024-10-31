@@ -10,15 +10,12 @@ module.exports.config = {
     usages: "echo <message>"
 };
 
-module.exports.onStart = async function ({ api, event,args }) {
-    const messageContent = args.join(" ");
-
-    const responseMessage = messageContent ? `You said: "${messageContent}"` : "Please provide a message to echo.";
-
+module.exports.onStart = async function ({ event, args, message }) {
     try {
-        await api.sendMessage(event.sender.id, { text: responseMessage });
+        const messageContent = args.join(" ");
+    const responseMessage = messageContent ? `You said: "${messageContent}"` : "Please provide a message to echo.";
+    await message.reply(responseMessage);
     } catch (error) {
-        console.error('Error in echo command:', error);
-        await api.sendMessage(event.sender.id, { text: "An error occurred." });
+        message.reply(error.message)
     }
 };

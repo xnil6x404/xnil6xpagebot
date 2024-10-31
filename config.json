@@ -1,6 +1,7 @@
 {
+    "admin":"Dip To",
     "prefix": "!",
     "adminID": [],
-    "Token": "EAASXVKkCgVcBOwbUDNrmzHLTT0Cq9PDZCxC73ry67LPwxfAqT89w3QSKxGiW5crZB3o7N0t9slCAdg8hU7sYbV3R9NtjnjKZCgZCRmmvVZCKHK8SUv9i3ZALvk2J0YEHHykv7N6nGWevQqdNOGpA3xEQDc99jj8DJgdPdmZCbZAltUMYyhmDYCtmeZBneZAyK0m2IdNq7zU7zxBgZDZD",
+    "Token": "TOKEN_HERE",
     "version": "6.9"
 }
