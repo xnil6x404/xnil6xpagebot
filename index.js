@@ -12,8 +12,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/webhook", (req, res) => {
-    const VERIFY_TOKEN = "dipto008";
-
+    const VERIFY_TOKEN = config.VERIFY_TOKEN;
+    console.log("verify",config.VERIFY_TOKEN)
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
     let challenge = req.query["hub.challenge"];
