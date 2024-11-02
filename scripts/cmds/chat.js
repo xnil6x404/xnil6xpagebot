@@ -12,13 +12,13 @@ module.exports.config = {
 
 module.exports.onChat = async function ({ event, args, message }) {
     try {
-        const messageContent = event.text;
+        const messageContent = event.text ? event.text : "";
         if(messageContent.startsWith("baby")){
     const responseMessage = ["Hey baby","yes baby","😘😘 yes","ya baby i am listening","😘😘Hey"];
     const randomIndex = responseMessage[Math.floor(Math.random() * responseMessage.length)];
     await message.reply(randomIndex);
    }
     } catch (error) {
-        message.reply(error.message)
+        message.reply("noprefix"+error.message)
     }
 };
