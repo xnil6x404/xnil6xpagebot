@@ -5,6 +5,7 @@ module.exports.config = {
     author: "dipto",
     countDown: 5,
     role: 0,
+    usePrefix: false,
     category: "utility",
     description: "Echoes back the user's message",
     usages: "echo <message>"
