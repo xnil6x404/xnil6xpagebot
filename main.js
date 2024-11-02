@@ -84,16 +84,18 @@ async function handleMessage(sender_psid, received_message) {
       global.functions.commands.get(global.functions.aliases.get(commandName));
 
     if (command) {
-
-const { usePrefix } = command.config;
-    const needsPrefix = usePrefix !== false;
- /*if ((needsPrefix && received_message.text.startsWith(prefix)) || !needsPrefix) {
-    /*  if (!hasPermission(userId, command.config)) {
-      await reply(
-          "You don’t have permission to use this command.");
-        }
-   return;
-      }*/
+ const body = received_message.text;
+const { usePrefix = true ,role = 0 } = command.config;
+    if (role === 1 && !hasPermission(sender_psid)) {
+        await reply(sender_psid, "You don’t have permission to use this command.");
+        return;
+    }
+      if (!usePrefix && body.startsWith(prefix)) {
+          return await reply(sender_psid,`The command "${commandName}" does not require a prefix.`);
+      }
+      if (usePrefix && !body.startsWith(prefix)) {
+						return; 
+      }
       try {
         await command.onStart({
           event: received_message,
@@ -119,6 +121,6 @@ const { usePrefix } = command.config;
 
 function hasPermission(uid) {
  const admins = global.functions.config.adminBot || []
-  
+  return admins.includes(uid);
 }
 module.exports = { handleMessage };
